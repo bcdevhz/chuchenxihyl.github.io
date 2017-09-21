@@ -1,5 +1,5 @@
 本周Rust进展(this-week-in-rust 200)
-# 新闻与博客
+# 1.新闻与博客
 - 宣布进入rust "实施互动期" ("impl period")
   完整链接https://blog.rust-lang.org/2017/09/18/impl-future-for-rust.html
   一直以2017路线图(2017 roadmap)努力工作，但在本年度最后一个季度，有一个更加崇高的目标——希望你能加入我们!(we want you to join us!)
@@ -77,7 +77,24 @@
   核心团队
   WG-core-site	      该网站正在大修; 欢迎塑造新内容！
 
+- 用Rust进行嵌入式系统开发的书籍 《Discover the world of microcontrollers through Rust》
+- Rust是最节约能耗的语言：SLE会议论文用工具及数据证明。
+- 播客show_notes::cysk::rayon，安全、多线程、并行的Rust代码。
 
+# 2.本周crate
+rug 使用GMP、MPFR和MPC提供任意精度整数、有理数及浮点数。
+
+# 3.呼吁参与
+   通过Rust项目参与开放式问题 (FindWork).
+   libz/blitz及其衍生crate semver.
+   
+# 4.rust核心更新
+   合并了160个PR
+   
+# 5.活动日程
+
+   
+   
 
   
   
