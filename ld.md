@@ -1,4 +1,4 @@
-PHP扩展配置文件checklib导致ld链接错误
+PHP扩展配置文件checklib导致ld链接错误。
 
 PHP扩展编译参数配置文件config.m4,用GNU autoXXX工具的一个checklib宏来检查某一个外部库(扩展里使用了该库)。
 
@@ -15,7 +15,7 @@ php-config则主要用来配置PHP安装信息(版本、路径、编译链接器
 
 扩展完成config后，可在config.log里查看整个配置过程。
 
-生成makefile的流程参考下图
+生成makefile的流程参考下图：
 
 ![Image](/Users/huyanlinyouzan.com/Downloads/blog1-makefile.gif)
 
@@ -28,25 +28,30 @@ autoXXX工具主要通过宏来配置，常见的宏有：
 
 `
 AC_ARG_ENABLE(arg_name,check message,help info)  //--enable-arg_name开配置项
+
 AC_ARG_WITH(arg_name,check message,help info)   //同上，默认开，不需要arg_name
+
 AC_DEFINE(variable, value, [description])  //自定义宏，配在config.h
+
 ADD_INCLUDE(dir)  // 添加include路径，即类似于链接器ld的-Idir,用于在指定的路径下找符号表信息
+
 AC_CHECK_FUNC(function, [action-if-found], [action-if-not-found])  //check函数是否存在
+
 AC_CHECK_LIB(library, function, [action-if-found], [action-if-not-found], [other-libraries]) //check库里的函数是否存在
 `
 除了以上还有未列出的如AC_CHECK_FILE／AC_ADD_LIBRARY_WITH_PATH等。
 
 这里特别需要提出的是AC_CHECK_LIB,它主要用来：
 
-*将要链接的library库是否存在(第一个参数library)
+- 将要链接的library库是否存在(第一个参数library)
 
-*如果库存在，库里是否包含function这个函数的符号表信息(第二个参数function) //这个可通过nm工具查看某库是否存在该符号表的引用、定义
+- 如果库存在，库里是否包含function这个函数的符号表信息(第二个参数function) //这个可通过nm工具查看某库是否存在该符号表的引用、定义
 
-*如果上述两步check下来结果为真，所要做的操作(第三个参数action-if-found)
+- 如果上述两步check下来结果为真，所要做的操作(第三个参数action-if-found)
 
-*如果上述两步check下来结果为假，所要做的操作(第四个参数action-if-not-found)
+- 如果上述两步check下来结果为假，所要做的操作(第四个参数action-if-not-found)
 
-*如果第二步check下来的符号表信息不充分，则尝试链接其它的库以匹配符号表(第五个参数other-libraries) //相当于-lX
+-如果第二步check下来的符号表信息不充分，则尝试链接其它的库以匹配符号表(第五个参数other-libraries) //相当于-lX
 
 # 3. 链接器信息与lib check
 
@@ -56,19 +61,19 @@ AC_CHECK_LIB(library, function, [action-if-found], [action-if-not-found], [other
 
 那么如果在正常编译生成尚未链接的目标文件后，链接阶段，想要链接第三方库文件，如果提示无法找到库文件，当且仅当原因有三：
 
-*没有库文件
+1. 没有库文件
 
-*路径配置不正确
+2. 路径配置不正确
 
-*库使用方式不正确
+3. 库使用方式不正确
 
 为解决本文开头引入的问题，当然也按上述步骤：
 
-*重新安装了库文件
+1. 重新安装了库文件
 
-*库路径设置称为绝对路径(不设情况下，默认库顺序为)
+2. 库路径设置称为绝对路径(不设情况下，默认库顺序为)
 
-*库名严格对应checklib宏中lXXX静态链接的libXXX.so（mac下则是libXXX.dylib)  
+3. 库名严格对应checklib宏中lXXX静态链接的libXXX.so（mac下则是libXXX.dylib)  
 
 (注意libXXX.so.xxx动态库一般含大小中三个版本，静态链接时认为libXXX.so.xxx与libXXX.so是两个不同的库，一般情况下通过软链接指过去)
 
@@ -80,15 +85,15 @@ AC_CHECK_LIB(library, function, [action-if-found], [action-if-not-found], [other
 
 众所周知，链接器的主要工作即是填写符号表地址的过程，即重定位。填写这个地址依据地址的类型与阶段，来区分链接器的功效。
 
-*模块内链接：解决程序内部跨文件引用
+1. 模块内链接：解决程序内部跨文件引用
 
-*装载重定位：引用外部库文件装载时重定位
+2. 装载重定位：引用外部库文件装载时重定位
 
-*延迟绑定：引用外部库文件时加快加载速度
+3. 延迟绑定：引用外部库文件时加快加载速度
 
 于是查看了config.log里链接出错的地方。一般出错会用下面log输出：
 
-`
+```
  /* Override any GCC internal prototype to avoid an error.
     Use char because int might match the return type of a GCC
     builtin and then its argument prototype would still apply.  */
@@ -103,7 +108,7 @@ AC_CHECK_LIB(library, function, [action-if-found], [action-if-not-found], [other
    ;
    return 0;
  }
-`
+```
 
 用gcc -lXXX命令行链接(本地环境库环境混乱，通过-I指定绝对路径)，链接成功，nm工具可查看完整符号表信息。
 
@@ -112,9 +117,9 @@ AC_CHECK_LIB(library, function, [action-if-found], [action-if-not-found], [other
 因此重新执行了phpize并重新config上库路径及名称,这次终于check成功，能成功链接，生成扩展符号表信息当然也正确。
 
 # 4.总结
-*AC_CHECK_LIB的机制，在编译时而非链接时，致使链接器部分链接时选项失效。
+1. AC_CHECK_LIB的机制，在编译时而非链接时，致使链接器部分链接时选项失效。
 
-*即使.so文件被拿来静态链接，链接时仍须遵守链接时命名规则。
+2. 即使.so文件被拿来静态链接，链接时仍须遵守链接时命名规则。
 
 这也是众多自动安装工具(如yum/brew)安装完一个.so后，会自动软链一个不含版本号到原因。
 
