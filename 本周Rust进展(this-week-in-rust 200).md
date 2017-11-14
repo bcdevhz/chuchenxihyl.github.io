@@ -60,8 +60,7 @@
   - WG-docs的-rbe	      在浏览器中教其他人Rust。	
 
 
-  开发工具团队
-  
+  开发工具团队  
   - WG-DEV-工具-RLS	     第一节课带你体验Rust的IDE。
   - WG-DEV-工具-vscode	 用VSCode改善对Rust IDE的体验。
   - WG-DEV-工具-clients	 实现新的RLS客户端：Atom,Sublime,Visual Studio等
@@ -126,7 +125,7 @@ rug 使用GMP、MPFR和MPC提供任意精度整数、有理数及浮点数。
    - 实现不安全的指针方法
    - 个性化定制const函数调用的特征
    - 删除废弃的语言项
-   - 夯实`iterator_for_each`、`drop_types_in_const`、`tcpstream_connect_timeout`、`compiler_fences`、`ord_max_min`
+   - 夯实  `iterator_for_each`、`drop_types_in_const`、`tcpstream_connect_timeout`、`compiler_fences`、`ord_max_min`
    
    
 # 5.活动日程
