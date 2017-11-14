@@ -61,15 +61,14 @@
 
 
   开发工具团队 
-  
-  -  WG-DEV-工具-RLS	     第一节课带你体验Rust的IDE。
-  -  WG-DEV-工具-vscode	   用VSCode改善对Rust IDE的体验。
-  -  WG-DEV-工具-clients	 实现新的RLS客户端：Atom,Sublime,Visual Studio等
-  -  WG-DEV-工具-IntelliJ  继续完善已经很丰富的Rust IDE体验。
-  -  WG-DEV-工具-rustfmt	 让你的Rust代码最漂亮！
-  -  WG-DEV-工具-rustup	   让你对Rust的第一印象更好！
-  -  WG-DEV-工具-clippy	   貌似你正在尝试写一个检查小工具。需要帮助么？
-  -  WG-DEV-工具-bindgen   使C和C++变得简单、自动、强大！	
+  1. WG-DEV-工具-RLS	     第一节课带你体验Rust的IDE。
+  2.  WG-DEV-工具-vscode	   用VSCode改善对Rust IDE的体验。
+  3.  WG-DEV-工具-clients	 实现新的RLS客户端：Atom,Sublime,Visual Studio等
+  4.  WG-DEV-工具-IntelliJ  继续完善已经很丰富的Rust IDE体验。
+  5.  WG-DEV-工具-rustfmt	 让你的Rust代码最漂亮！
+  6.  WG-DEV-工具-rustup	   让你对Rust的第一印象更好！
+  7.  WG-DEV-工具-clippy	   貌似你正在尝试写一个检查小工具。需要帮助么？
+  8.  WG-DEV-工具-bindgen   使C和C++变得简单、自动、强大！	
 
   Cargo团队
   - WG-cargo-native     不再为本地代码的依赖关系而发愁。
