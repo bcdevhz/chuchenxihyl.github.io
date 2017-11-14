@@ -26,20 +26,15 @@ config.m4文件主要包含添加编译参数、链接库名及相应路径、�
 
 autoXXX工具主要通过宏来配置，常见的宏有：
 
-`
+```
 AC_ARG_ENABLE(arg_name,check message,help info)  //--enable-arg_name开配置项
-
 AC_ARG_WITH(arg_name,check message,help info)   //同上，默认开，不需要arg_name
-
 AC_DEFINE(variable, value, [description])  //自定义宏，配在config.h
-
 ADD_INCLUDE(dir)  // 添加include路径，即类似于链接器ld的-Idir,用于在指定的路径下找符号表信息
-
 AC_CHECK_FUNC(function, [action-if-found], [action-if-not-found])  //check函数是否存在
-
 AC_CHECK_LIB(library, function, [action-if-found], [action-if-not-found], [other-libraries]) //check库里的函数是否存在
-`
 除了以上还有未列出的如AC_CHECK_FILE／AC_ADD_LIBRARY_WITH_PATH等。
+```
 
 这里特别需要提出的是AC_CHECK_LIB,它主要用来：
 
