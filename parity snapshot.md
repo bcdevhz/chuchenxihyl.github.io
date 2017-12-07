@@ -31,13 +31,13 @@ parity snapshot
 - State Chunks状态分块及Validity有效性约束。
 
 2. 包含的组件：
-- 1) io  快照io读写操作，支持写单文件及多文件两种方式的文件格式。
-- 2）service  快照网络服务实现
-- 3）account  账户状态(RLP编解码)
-- 4）block    AB区块(原区块裁剪)
+- 1）io        快照io读写操作，支持写单文件及多文件两种方式的文件格式。
+- 2）service   快照网络服务实现
+- 3）account   账户状态(RLP编解码)
+- 4）block     AB区块(原区块裁剪)
 - 5）consensus 共识快照
-- 6）watcher  监听快照相关的链事件
-- 7）error    快照定制的错误类型
+- 6）watcher   监听快照相关的链事件
+- 7）error     快照定制的错误类型
 
 3. 获取快照，函数take_snapshot
 ```
@@ -53,13 +53,76 @@ pub fn take_snapshot<W: SnapshotWriter + Send>(   //
 基本逻辑：
 - 1）从chain的block_at获取start_header，继而获取state_root及number。
 - 2）engine.snapshot_components()共识获取快照chunk分块,同事获取snapshot_version。
-- 3) `chunk_secondary(chunker, chain, block_at, writer, p)`获取block_guard。
+- 3）`chunk_secondary(chunker, chain, block_at, writer, p)`获取block_guard。
 - 4）`chunk_state(state_db, state_root, writer, p)`获取state_res。
 - 5）state_res+block_guard map成元组`(state_hashes, block_hashes)`。
 - 6）依上，填充结构`ManifestData`，形成一个manifest_data实例。
 - 7）写快照完成`writer.into_inner().finish(manifest_data)`，并将p.done置
 
    其中结构Progress表示快照的进度。含4个字段`accounts+blocks+size+done`。默认实现方法reset重置每一个字段，accounts获取当前快照的账户数，blocks获取当前快照的区块数，size获取快照字节大小，done快照是否完成。
+   
+4. chunk_secondary
+
+所有secondary chunks创建并写到磁盘，返回该chunks集合。具体地说，这些chunks共识相关，但用于证实state chunks的状态数据。返回chunk hash集合，第一个为离创世块最远的区块集。
+```
+pub fn chunk_secondary<'a>(mut chunker: Box<SnapshotComponents>, chain: &'a BlockChain, start_hash: H256, writer: &Mutex<SnapshotWriter + 'a>, progress: &'a Progress) -> Result<Vec<H256>, Error> {
+```
+5. chunk_state
+
+依给定状态根root遍历状态DB,创建chunks并写，返回chunks集。
+```
+pub fn chunk_state<'a>(db: &HashDB, root: &H256, writer: &Mutex<SnapshotWriter + 'a>, progress: &'a Progress) -> Result<Vec<H256>, Error> {
+```
+状态树chunk结构如下，状态改变在其上改变write_chunk/push。
+```
+/// State trie chunker.
+struct StateChunker<'a> {
+	hashes: Vec<H256>,
+	rlps: Vec<Bytes>,
+	cur_size: usize,
+	snappy_buffer: Vec<u8>,
+	writer: &'a Mutex<SnapshotWriter + 'a>,
+	progress: &'a Progress,
+}
+```
+
+复建状态树，new/feed/finalize
+```
+pub struct StateRebuilder {
+	db: Box<JournalDB>,
+	state_root: H256,
+	known_code: HashMap<H256, H256>, // code hashes mapped to first account with this code.
+	missing_code: HashMap<H256, Vec<H256>>, // maps code hashes to lists of accounts missing that code.
+	bloom: Bloom,
+	known_storage_roots: HashMap<H256, H256>, // maps account hashes to last known storage root. Only filled for last account per chunk.
+}
+```
+
+复建状态及存储集
+```
+struct RebuiltStatus {
+	// new code that's become available. (code_hash, code, addr_hash)
+	new_code: Vec<(H256, Bytes, H256)>,
+	missing_code: Vec<(H256, H256)>, // accounts that are missing code.
+}
+
+// rebuild a set of accounts and their storage.
+// returns a status detailing newly-loaded code and accounts missing code.
+fn rebuild_accounts(
+	db: &mut HashDB,
+	account_fat_rlps: UntrustedRlp,
+	out_chunk: &mut [(H256, Bytes)],
+	known_code: &HashMap<H256, H256>,
+	known_storage_roots: &mut HashMap<H256, H256>,
+	abort_flag: &AtomicBool,
+) -> Result<RebuiltStatus, ::error::Error> {
+```
+
+此外验证区块，供PowRebuilder使用
+```
+pub fn verify_old_block(rng: &mut OsRng, header: &Header, engine: &EthEngine, chain: &BlockChain, always: bool) -> Result<(), ::error::Error> {
+```
+
 
 #  1. 快照io读写
 
