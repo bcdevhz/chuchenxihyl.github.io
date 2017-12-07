@@ -31,14 +31,35 @@ parity snapshot
 - State Chunks状态分块及Validity有效性约束。
 
 2. 包含的组件：
-1) io  快照io读写操作，支持写单文件及多文件两种方式的文件格式。
-2）service  快照网络服务实现
-3）account  账户状态(RLP编解码)
-4）block    AB区块(原区块裁剪)
-5）consensus 共识快照
-6）watcher  监听快照相关的链事件
-7）error    快照定制的错误类型
+- 1) io  快照io读写操作，支持写单文件及多文件两种方式的文件格式。
+- 2）service  快照网络服务实现
+- 3）account  账户状态(RLP编解码)
+- 4）block    AB区块(原区块裁剪)
+- 5）consensus 共识快照
+- 6）watcher  监听快照相关的链事件
+- 7）error    快照定制的错误类型
 
+3. 获取快照，函数take_snapshot
+```
+pub fn take_snapshot<W: SnapshotWriter + Send>(   //
+	engine: &EthEngine,
+	chain: &BlockChain,  
+	block_at: H256,  //快照开始的区块hash
+	state_db: &HashDB,  //DB
+	writer: W,    //SnapshotWriter往指定文件以快照格式写
+	p: &Progress   //快照进度
+) -> Result<(), Error>
+```
+基本逻辑：
+- 1）从chain的block_at获取start_header，继而获取state_root及number。
+- 2）engine.snapshot_components()共识获取快照chunk分块,同事获取snapshot_version。
+- 3) `chunk_secondary(chunker, chain, block_at, writer, p)`获取block_guard。
+- 4）`chunk_state(state_db, state_root, writer, p)`获取state_res。
+- 5）state_res+block_guard map成元组`(state_hashes, block_hashes)`。
+- 6）依上，填充结构`ManifestData`，形成一个manifest_data实例。
+- 7）写快照完成`writer.into_inner().finish(manifest_data)`，并将p.done置
+
+   其中结构Progress表示快照的进度。含4个字段`accounts+blocks+size+done`。默认实现方法reset重置每一个字段，accounts获取当前快照的账户数，blocks获取当前快照的区块数，size获取快照字节大小，done快照是否完成。
 
 #  1. 快照io读写
 
