@@ -11,7 +11,7 @@ EVM基于栈，而IELE类似LLVM基于寄存器。类似于LLVM也直接支持�
 
 #  1.设计背景
 
-##  1.作为统一用于翻译、执行高级语言编写的智能合约底层平台，这些合约也可通过ABI交互
+##  1.统一用于翻译、执行高级语言编写的智能合约底层平台，合约也可通过ABI交互
 
 ABI是IELE的核心元素，而不仅仅是基于它的一个协议。由于LLVM的成功，长远看无限制的寄存器集整形值，使得高级语言的编译更佳高效。
 
@@ -150,5 +150,5 @@ IELE会弱化这个约束，维持静态label作为唯一允许的跳转地址�
 由于IELE是任意精度的有符号整型，因此不用shr/shl指令，而是采用带符号的位移量来表示位移。
 
 
-[参考]：(https://github.com/runtimeverification/iele-semantics/blob/master/Design.md)
+[参考](https://github.com/runtimeverification/iele-semantics/blob/master/Design.md)
 
